@@ -46,22 +46,21 @@ class Deck {
 
     fun playerMove2(): Boolean{
         while(true){
-            try{
-                println("Choose a card to play (${playerDeck.indexOf(playerDeck.first()) + 1}-${playerDeck.indexOf(playerDeck.last()) + 1}):")
-                val index = readln().toInt() - 1
-                cardsOnTable.add(playerDeck[index])
-                playerDeck.removeAt(index)
-                break
-            }catch (e:NumberFormatException) {
-                if (e.message == "For input string: \"exit\"") {
-                    println("Game Over")
-                    return true
-                    break
-                }
-            }catch (_:IndexOutOfBoundsException) {
+            val playerInput = readln()
+            if(playerInput == "exit") {
+                return true
             }
+            try{
+                println("Choose a card to play (1 - ${playerDeck.size}):")
+                val nextMove = playerInput.toInt()-1
+                if(nextMove !in 0 until playerDeck.size) {
+                    continue
+                }
+                cardsOnTable.add(playerDeck[nextMove])
+                playerDeck.removeAt(nextMove)
+                return false
+            } catch (_:NumberFormatException) { }
         }
-        return false
     }
 
     fun computerMove() {
@@ -120,4 +119,5 @@ fun main() {
         }
     }
     print("hi")
+    print("hello")
 }
