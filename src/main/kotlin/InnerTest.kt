@@ -14,6 +14,11 @@ class Deck {
     /*Cards on table holds the current cards in play on the table.*/
     val playerDeck = mutableListOf<String>()
     /*Player deck holds all the cards in players hand.*/
+    var playerScoreCount = 0
+    var playerCardsCount = 0
+    var computerScoreCount = 0
+    var computerCardsCount = 0
+
 //    fun reset() {
 //        this.mainDeck.clear()
 //        this.mainDeck.addAll(mainDeckOfCards)
@@ -53,21 +58,31 @@ class Deck {
     */
     fun playerMove2(): Boolean{
         while(true){
+            println("Choose a card to play (1 - ${playerDeck.size}):")
             val playerInput = readln()
             if(playerInput == "exit") {
                 return true
             }
             try{
-                println("Choose a card to play (1 - ${playerDeck.size}):")
                 val nextMove = playerInput.toInt()-1
                 if(nextMove !in 0 until playerDeck.size) {
                     continue
                 }
+                if(playerDeck[nextMove].first() == cardsOnTable.last().first() || playerDeck[nextMove].last() == cardsOnTable.last().last()) {
+                    cardsOnTable
+                    println("""
+                        Player wins cards
+                        Score: Player $playerScoreCount - Computer 0
+                        Cards: Player $playerCardsCount - Computer 0
+                    """.trimIndent())
+                }
+
                 cardsOnTable.add(playerDeck[nextMove])
                 playerDeck.removeAt(nextMove)
                 return false
             } catch (_:NumberFormatException) { }
         }
+
     }
     /*Player move 2 in steps
     * 1. Input the selection from choices above

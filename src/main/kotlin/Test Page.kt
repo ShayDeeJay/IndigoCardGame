@@ -1,16 +1,11 @@
-//open class Wood(val age: Int) {
-//    fun getWoodInfo(): String {
-//        return "age $age"
-//    }
-//}
-//
-//class Pine(val isSpiny: Boolean, age: Int) : Wood(age) {
-//    fun getPineInfo(): String {
-//        return getWoodInfo() + ", spiny $isSpiny"
-//    }
-//}
-//
-//fun main() {
-//    val pine = Pine(true, 3)
-//    println(pine.getPineInfo() + ", " + pine.getWoodInfo())
-//}
+fun main() {
+
+    val x = listOf("A♠", "2♠", "3♠", "4♠", "5♠", "6♠", "7♠", "8♠", "9♠", "10♠", "J♠", "Q♠", "K♠",
+        "A♥", "2♥", "3♥", "4♥", "5♥", "6♥", "7♥", "8♥", "9♥", "10♥", "J♥", "Q♥", "K♥",
+        "A♦", "2♦", "3♦", "4♦", "5♦", "6♦", "7♦", "8♦", "9♦", "10♦", "J♦", "Q♦", "K♦",
+        "A♣", "2♣", "3♣", "4♣", "5♣", "6♣", "7♣", "8♣", "9♣", "10♣", "J♣", "Q♣", "K♣")
+
+    println(x[0].last())
+
+
+}
