@@ -18,11 +18,13 @@ class Deck {
     var playerCardsCount = 0
     var computerScoreCount = 0
     var computerCardsCount = 0
+    var startDecision = ""
 
 //    fun reset() {
 //        this.mainDeck.clear()
 //        this.mainDeck.addAll(mainDeckOfCards)
 //    }
+
     /*Reset resets the main deck back to its original un-shuffled state.*/
     fun shuffle() = this.mainDeck.shuffle()
     /*Shuffles deck.*/
@@ -35,6 +37,30 @@ class Deck {
     }
     /*Keeps track of size of cards on table and top card on table, made in to a function so that it can keep the count
     * updated in the main function. */
+    fun startDecision(): Boolean {
+        when(startDecision) {
+            "yes" -> {
+                playerMove()
+                if(playerMove2()) return true
+                computerMove()
+            }
+            "no" -> {
+                computerMove()
+                playerMove()
+                if(playerMove2()) return true
+            }
+        }
+        return false
+    }
+    fun cardPointCheck(a: String, b: String){
+        when(a.substringBefore(b)) {
+            "10" -> playerScoreCount ++
+            "A" -> playerScoreCount ++
+            "J" -> playerScoreCount ++
+            "Q" -> playerScoreCount ++
+            "K" -> playerScoreCount ++
+        }
+    }
     fun playerMove(){
         if (playerDeck.size < 1) {
             repeat(6) {
@@ -69,16 +95,27 @@ class Deck {
                     continue
                 }
                 if(playerDeck[nextMove].first() == cardsOnTable.last().first() || playerDeck[nextMove].last() == cardsOnTable.last().last()) {
-                    cardsOnTable
+                    cardsOnTable.add(playerDeck[nextMove])
+                    playerDeck.removeAt(nextMove)
+                    playerCardsCount += cardsOnTable.size
+                    for (x in cardsOnTable){
+                        cardPointCheck(x,"♠")
+                        cardPointCheck(x,"♥")
+                        cardPointCheck(x,"♦")
+                        cardPointCheck(x,"♣")
+                    }
+                    cardsOnTable.clear()
                     println("""
                         Player wins cards
                         Score: Player $playerScoreCount - Computer 0
                         Cards: Player $playerCardsCount - Computer 0
+                        
                     """.trimIndent())
-                }
 
-                cardsOnTable.add(playerDeck[nextMove])
-                playerDeck.removeAt(nextMove)
+                } else {
+                    cardsOnTable.add(playerDeck[nextMove])
+                    playerDeck.removeAt(nextMove)
+                }
                 return false
             } catch (_:NumberFormatException) { }
         }
@@ -93,13 +130,19 @@ class Deck {
     * 5. Cjecls */
 
     fun computerMove() {
-        println(
-            """
+        when (cardsOnTable.size) {
+            0 -> println("""
+                No cards on the table
+                Computer plays ${deal()}
+            """.trimIndent())
+            else -> println(
+                """
 
                 ${cardsOnTableUpdater()}
                 Computer plays ${deal()}
             """.trimIndent()
-        )
+            )
+        }
         cardsOnTable.add(deal())
         removeCard()
     }
@@ -107,7 +150,6 @@ class Deck {
 }
 fun main() {
     val deck = Deck()
-    var startDecision = ""
     println("Indigo Card Game")
 
     while (true) {
@@ -115,7 +157,7 @@ fun main() {
         val playerChoice = readln()
 
         if (playerChoice == "yes" || playerChoice == "no") {
-            startDecision = playerChoice
+            deck.startDecision = playerChoice
             deck.shuffle()
             repeat(4) {
                 deck.cardsOnTable.add(deck.deal())
@@ -132,17 +174,10 @@ fun main() {
     * 4. Print cards on table.
     * */
     while (deck.cardsOnTable.size < 52) {
-        when(startDecision) {
-            "yes" -> {
-                deck.playerMove()
-                if(deck.playerMove2()) break
-                deck.computerMove()
-            }
-            "no" -> {
-                deck.computerMove()
-                deck.playerMove()
-                if(deck.playerMove2()) break
-            }
+        deck.startDecision
+        if(deck.startDecision()) {
+            println("Game Over")
+            break
         }
         if(deck.cardsOnTable.size == 52) {
             println("""
