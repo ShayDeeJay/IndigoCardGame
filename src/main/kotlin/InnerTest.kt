@@ -61,6 +61,26 @@ class Deck {
             "K" -> playerScoreCount ++
         }
     }
+
+    fun winConditionCheck(a: String){
+        if(a.first() == cardsOnTable.last().first() || a.last() == cardsOnTable.last().last()) {
+            cardsOnTable.add(a)
+            for (x in cardsOnTable) {
+                cardPointCheck(x, "♠")
+                cardPointCheck(x, "♥")
+                cardPointCheck(x, "♦")
+                cardPointCheck(x, "♣")
+            }
+            println(
+                """
+                        Player wins cards
+                        Score: Player $playerScoreCount - Computer 0
+                        Cards: Player $playerCardsCount - Computer 0
+                        
+                    """.trimIndent()
+            )
+        }
+    }
     fun playerMove(){
         if (playerDeck.size < 1) {
             repeat(6) {
@@ -94,28 +114,10 @@ class Deck {
                 if(nextMove !in 0 until playerDeck.size) {
                     continue
                 }
-                if(playerDeck[nextMove].first() == cardsOnTable.last().first() || playerDeck[nextMove].last() == cardsOnTable.last().last()) {
-                    cardsOnTable.add(playerDeck[nextMove])
-                    playerDeck.removeAt(nextMove)
-                    playerCardsCount += cardsOnTable.size
-                    for (x in cardsOnTable){
-                        cardPointCheck(x,"♠")
-                        cardPointCheck(x,"♥")
-                        cardPointCheck(x,"♦")
-                        cardPointCheck(x,"♣")
-                    }
-                    cardsOnTable.clear()
-                    println("""
-                        Player wins cards
-                        Score: Player $playerScoreCount - Computer 0
-                        Cards: Player $playerCardsCount - Computer 0
-                        
-                    """.trimIndent())
-
-                } else {
-                    cardsOnTable.add(playerDeck[nextMove])
-                    playerDeck.removeAt(nextMove)
-                }
+                winConditionCheck(playerDeck[nextMove])
+                playerDeck.removeAt(nextMove)
+                playerCardsCount += cardsOnTable.size
+                cardsOnTable.clear()
                 return false
             } catch (_:NumberFormatException) { }
         }
@@ -134,6 +136,7 @@ class Deck {
             0 -> println("""
                 No cards on the table
                 Computer plays ${deal()}
+                ${winConditionCheck(deal(),)}
             """.trimIndent())
             else -> println(
                 """
