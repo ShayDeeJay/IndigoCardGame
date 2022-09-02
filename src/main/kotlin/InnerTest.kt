@@ -13,6 +13,7 @@ class Deck {
     val mainDeck = ArrayList(mainDeckOfCards)
     val cardsOnTable = ArrayList<String>()
     val playerDeck = ArrayList<String>()
+    val computerDeck = ArrayList<String>()
     var playerScoreCount = 0
     var playerCardsCount = 0
     var computerScoreCount = 0
@@ -27,7 +28,7 @@ class Deck {
 
     fun cardsOnTableUpdater() {
         return when (cardsOnTable.size) {
-            0 -> println("\nNo cards on the table")
+            0 -> println("No cards on the table")
             else -> println("${cardsOnTable.size} cards on the table, and the top card is ${cardsOnTable.last()}")
         }
     }
@@ -35,7 +36,6 @@ class Deck {
     fun startDecision(): Boolean {
         when (startDecision) {
             "yes" -> {
-                showCardsToPlayer()
                 if (playerMove()) {
                     return true
                 }
@@ -43,7 +43,6 @@ class Deck {
             }
             "no" -> {
                 computerMove()
-                showCardsToPlayer()
                 if (playerMove()) {
                     return true
                 }
@@ -76,28 +75,27 @@ class Deck {
         a.removeAt(c)
     }
 
-    fun showCardsToPlayer() {
-        if (playerDeck.size < 1) {
-            val deal = deal()
+    fun emptyDeckDeal(deck: ArrayList<String>) {
+        if (deck.size < 1) {
             repeat(6) {
-                playerDeck.add(deal)
+                deck.add(deal())
                 removeCard()
             }
         }
-        println()
-        cardsOnTableUpdater()
-        print("Cards in hand: ")
-        playerDeck.forEachIndexed { card, index ->
-            print("${index + 1})$card ")
-        }
-        println()
     }
-//add for no reason
+
     fun playerMove(): Boolean {
         while (true) {
+            emptyDeckDeal(playerDeck)
+            println()
+            cardsOnTableUpdater()
+            println("Cards in hand: ")
+            playerDeck.forEachIndexed {  index, card ->
+                print("${index + 1})$card ")
+            }
+            println()
             println("Choose a card to play (1-${playerDeck.size}):")
             val playerInput = readln()
-            println()
             if (playerInput == "exit") {
                 return true
             }
@@ -114,9 +112,13 @@ class Deck {
     }
 
     fun computerMove() {
+        emptyDeckDeal(computerDeck)
+        val randomCard = computerDeck.random()
+        println()
         cardsOnTableUpdater()
-        println("Computer plays ${deal()}")
-        dealOrNoDeal("Computer", mainDeck, 0, this::computerCardsCount, this::computerScoreCount)
+        println(computerDeck.joinToString (separator = " "))
+        println("Computer plays $randomCard")
+        dealOrNoDeal("Computer", computerDeck, computerDeck.indexOf(randomCard), this::computerCardsCount, this::computerScoreCount)
     }
 
     private fun dealOrNoDeal(
@@ -153,10 +155,10 @@ fun main() {
         val playerChoice = readln()
 
         if (playerChoice == "yes" || playerChoice == "no") {
+            deck.startDecision = playerChoice
             deck.shuffle()
-            val deal = deck.deal()
             repeat(4) {
-                deck.cardsOnTable.add(deal)
+                deck.cardsOnTable.add(deck.deal())
                 deck.removeCard()
             }
             println("Initial cards on the table: ${deck.cardsOnTable.joinToString(separator = " ")}")
@@ -195,3 +197,4 @@ fun main() {
         }
     }
 }
+
