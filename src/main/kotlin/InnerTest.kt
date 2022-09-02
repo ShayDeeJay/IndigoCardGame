@@ -1,11 +1,11 @@
-class Deck {
-//    val cardsOnTable = mutableListOf<String>("8♣", "10♣", "J♣", "7♠")
-    val computerDeck = mutableListOf<String>("7♦", "8♠", "5♣", "3♠")
-}
-fun main() {
-    val deck = Deck()
-    val suitCheck = ArrayList<String>()
-    val rankCheck = ArrayList<String>()
+//class Deck {
+////    val cardsOnTable = mutableListOf<String>("8♣", "10♣", "J♣", "7♠")
+//    val computerDeck = mutableListOf<String>("7♦", "8♠", "5♣", "3♠")
+//}
+//fun main() {
+//    val deck = Deck()
+//    val suitCheck = ArrayList<String>()
+//    val rankCheck = ArrayList<String>()
 //
 //    for (i in deck.cardsOnTable) {
 //        for (j in deck.computerDeck) {
@@ -28,7 +28,7 @@ fun main() {
 
 //    println(deck.computerDeck.sorted().last())
 
-    val computerDeck = deck.computerDeck
+//    val computerDeck = deck.computerDeck
 //
 //    val tempList = ArrayList<String>()
 //
@@ -67,4 +67,4 @@ fun main() {
 //
 //    println(tempList)
 
-}
+//}

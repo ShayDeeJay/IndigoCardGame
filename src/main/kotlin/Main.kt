@@ -113,12 +113,43 @@ class Deck {
                     addAndRemove(computerDeck,cardsOnTable[matchingCardRank],matchingCardRank)
                 }
             }
-            cardsOnTable.size == 0 -> {
-
-
+            suitCheck.size + rankCheck.size == 0 -> {
+                computerDeck.sortBy { it.last() }
+                for(dupe in 0 until computerDeck.size -1) {
+                    if(computerDeck[dupe].last() == computerDeck[dupe + 1].last()) {
+                        addAndRemove(computerDeck,cardsOnTable[dupe],dupe)
+                    }
+                }
+                computerDeck.sortBy { it.first() }
+                for(dupe in 0 until computerDeck.size -1) {
+                    if(computerDeck[dupe].first() == computerDeck[dupe + 1].first()) {
+                        addAndRemove(computerDeck,cardsOnTable[dupe],dupe)
+                    }
+                }
             }
-        }
+            cardsOnTable.size == 0 -> {
+                computerDeck.sortBy { it.last() }
+                for(dupe in 0 until computerDeck.size -1) {
+                    if(computerDeck[dupe].last() == computerDeck[dupe + 1].last()) {
+                        addAndRemove(computerDeck,cardsOnTable[dupe],dupe)
+                    }
+                }
+                computerDeck.sortBy { it.first() }
+                for(dupe in 0 until computerDeck.size -1) {
+                    if(computerDeck[dupe].first() == computerDeck[dupe + 1].first()) {
+                        addAndRemove(computerDeck,cardsOnTable[dupe],dupe)
+                    }
+                }
+            }
+            suitCheck.size > 1 -> {
+                addAndRemove(computerDeck,cardsOnTable[suitCheck[0].last().digitToInt()],suitCheck[0].last().digitToInt())
+            }
+            rankCheck.size > 1 -> {
+                addAndRemove(computerDeck,cardsOnTable[rankCheck[0].last().digitToInt()],rankCheck[0].last().digitToInt())
+            }
+            //implement a throw any candidate card at random here.
 
+        }
     }
     fun playerMove(): Boolean {
         while (true) {
