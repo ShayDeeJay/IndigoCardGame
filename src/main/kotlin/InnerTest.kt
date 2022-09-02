@@ -84,6 +84,33 @@ class Deck {
         }
     }
 
+
+    fun computerMoveLogic() {
+        val suitCheck = ArrayList<Char>()
+        val rankCheck = ArrayList<Char>()
+        if (computerDeck.size == 1) {
+            addAndRemove(computerDeck,cardsOnTable[0],0)
+        }
+        for (i in cardsOnTable) {
+            for(j in computerDeck) {
+                if(j.first() == i.first())
+                    suitCheck.add(j.first())
+            }
+        }
+        for (i in cardsOnTable) {
+            for(j in computerDeck) {
+                if(j.first() == i.first())
+                    suitCheck.add(j)
+            }
+        }
+        when {
+            computerDeck.size == 1 -> {
+                addAndRemove(computerDeck,cardsOnTable[0],0)
+            }
+            suitCheck.size ==
+        }
+    }
+
     fun playerMove(): Boolean {
         while (true) {
             emptyDeckDeal(playerDeck)
