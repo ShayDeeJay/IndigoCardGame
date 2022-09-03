@@ -2,8 +2,8 @@ class Deck {
 
 //    private val cardsOnTable = mutableListOf<String>("8♣", "10♣", "J♣", "7♠")
 //    private val computerDeck = mutableListOf<String>("2♣", "9♥", "5♠", "3♦")
-    private val cardsOnTable = mutableListOf<String>()
-    private val computerDeck = mutableListOf<String>("2♦", "A♠", "Q♠")
+    private val cardsOnTable = mutableListOf<String>("8♣", "10♣", "J♣", "7♠")
+    private val computerDeck = mutableListOf<String>("Q♦")
 
 
 
@@ -12,20 +12,22 @@ class Deck {
         val suitCheck = ArrayList<String>()
         val rankCheck = ArrayList<String>()
         fun suitCheck() {
-            computerDeck.sortBy { it.last() }
-            for(dupe in 0 until computerDeck.size -1) {
-                if(computerDeck[dupe].last() == computerDeck[dupe + 1].last()) {
-                    cardsPosition = dupe
+            val tempList = computerDeck.toMutableList()
+            tempList.sortBy { it.last() }
+            for(dupe in 0 until tempList.size -1) {
+                if(tempList[dupe].last() == tempList[dupe + 1].last()) {
+                    cardsPosition = computerDeck.indexOf(tempList[dupe])
                     return
                 }
             }
         }
 
         fun rankCheck() {
-            computerDeck.sortBy { it.first() }
-            for(dupe in 0 until computerDeck.size -1) {
-                if(computerDeck[dupe].first() == computerDeck[dupe + 1].first()) {
-                    cardsPosition = dupe
+            val tempList = computerDeck.toMutableList()
+            tempList.sortBy { it.first() }
+            for(dupe in 0 until tempList.size -1) {
+                if(tempList[dupe].first() == tempList[dupe + 1].first()) {
+                    cardsPosition = computerDeck.indexOf(tempList[dupe])
                     return
                 }
             }
@@ -36,7 +38,6 @@ class Deck {
         }
 
         if (computerDeck.size == 1) {
-            cardsPosition = 0
             return 0
         }
 
@@ -86,7 +87,6 @@ class Deck {
 }
 fun main() {
         val deck = Deck()
-
         println(deck.computerMoveLogic())
 
 }
