@@ -85,70 +85,93 @@
 //    }
 //
 //
-//    fun computerMoveLogic() {
+//    fun computerMoveLogic(): Int {
+//        var cardsPosition = 0
 //        val suitCheck = ArrayList<String>()
 //        val rankCheck = ArrayList<String>()
-//        if (computerDeck.size == 1) {
-//            addAndRemove(computerDeck,cardsOnTable[0],0)
+//        fun suitCheck() {
+//            val tempList = computerDeck.toMutableList()
+//            tempList.sortBy { it.last() }
+//            for(dupe in 0 until tempList.size -1) {
+//                if(tempList[dupe].last() == tempList[dupe + 1].last()) {
+//                    cardsPosition = computerDeck.indexOf(tempList[dupe])
+//                    return
+//                }
+//            }
 //        }
+//
+//        fun rankCheck() {
+//            val tempList = computerDeck.toMutableList()
+//            tempList.sortBy { it.first() }
+//            for(dupe in 0 until tempList.size -1) {
+//                if(tempList[dupe].first() == tempList[dupe + 1].first()) {
+//                    cardsPosition = computerDeck.indexOf(tempList[dupe])
+//                    return
+//                }
+//            }
+//        }
+//
+//        fun randomCard() {
+//            cardsPosition = computerDeck.indexOf(computerDeck.random())
+//        }
+//
+//        if (computerDeck.size == 1) {
+//            return 0
+//        }
+//
 //        for (i in cardsOnTable) {
 //            for(j in computerDeck) {
 //                if(j.last() == i.last())
 //                    suitCheck.add(j.last().toString() + computerDeck.indexOf(j))
 //            }
 //        }
+//
 //        for (i in cardsOnTable) {
 //            for(j in computerDeck) {
 //                if(j.first() == i.first())
 //                    rankCheck.add(j.first().toString() + computerDeck.indexOf(j))
 //            }
 //        }
+//
+//        val suitDistinct = suitCheck.distinct()
+//        val rankDistinct = rankCheck.distinct()
+//
 //        when {
-//            suitCheck.size + rankCheck.size == 1 -> {
-//                val matchingCardSuit = suitCheck[0].last().digitToInt()
-//                val matchingCardRank = rankCheck[0].last().digitToInt()
-//                if(suitCheck.size == 1) {
-//                    addAndRemove(computerDeck,cardsOnTable[matchingCardSuit],matchingCardSuit)
+//            suitDistinct.size + rankDistinct.size == 1 -> {
+//                cardsPosition = if(suitDistinct.size == 1) {
+//                    suitDistinct[0].last().digitToInt()
 //                } else {
-//                    addAndRemove(computerDeck,cardsOnTable[matchingCardRank],matchingCardRank)
-//                }
-//            }
-//            suitCheck.size + rankCheck.size == 0 -> {
-//                computerDeck.sortBy { it.last() }
-//                for(dupe in 0 until computerDeck.size -1) {
-//                    if(computerDeck[dupe].last() == computerDeck[dupe + 1].last()) {
-//                        addAndRemove(computerDeck,cardsOnTable[dupe],dupe)
-//                    }
-//                }
-//                computerDeck.sortBy { it.first() }
-//                for(dupe in 0 until computerDeck.size -1) {
-//                    if(computerDeck[dupe].first() == computerDeck[dupe + 1].first()) {
-//                        addAndRemove(computerDeck,cardsOnTable[dupe],dupe)
-//                    }
+//                    rankDistinct[0].last().digitToInt()
 //                }
 //            }
 //            cardsOnTable.size == 0 -> {
-//                computerDeck.sortBy { it.last() }
-//                for(dupe in 0 until computerDeck.size -1) {
-//                    if(computerDeck[dupe].last() == computerDeck[dupe + 1].last()) {
-//                        addAndRemove(computerDeck,cardsOnTable[dupe],dupe)
+//                suitCheck()
+//                rankCheck()
+//                randomCard()
+//            }
+//            suitDistinct.size + rankDistinct.size == 0 -> {
+//                suitCheck()
+//                rankCheck()
+//                randomCard()
+//            }
+//            suitDistinct.size + rankDistinct.size >= 2 -> {
+//                cardsPosition = if(suitDistinct.size >= 2) {
+//                    suitDistinct[0].last().digitToInt()
+//                } else {
+//                    rankDistinct[0].last().digitToInt()
+//                }
+//                cardsPosition = when {
+//                    suitDistinct.size >= 2 -> suitDistinct[0].last().digitToInt()
+//                    rankDistinct.size >= 2 -> rankDistinct[0].last().digitToInt()
+//                    else -> if(suitDistinct.isEmpty()) {
+//                        rankDistinct[0].last().digitToInt()
+//                    } else {
+//                        suitDistinct[0].last().digitToInt()
 //                    }
 //                }
-//                computerDeck.sortBy { it.first() }
-//                for(dupe in 0 until computerDeck.size -1) {
-//                    if(computerDeck[dupe].first() == computerDeck[dupe + 1].first()) {
-//                        addAndRemove(computerDeck,cardsOnTable[dupe],dupe)
-//                    }
-//                }
 //            }
-//            suitCheck.size > 1 -> {
-//                addAndRemove(computerDeck,cardsOnTable[suitCheck[0].last().digitToInt()],suitCheck[0].last().digitToInt())
-//            }
-//            rankCheck.size > 1 -> {
-//                addAndRemove(computerDeck,cardsOnTable[rankCheck[0].last().digitToInt()],rankCheck[0].last().digitToInt())
-//            }
-//            //implement a throw any candidate card at random here.
 //        }
+//        return cardsPosition
 //    }
 //    fun playerMove(): Boolean {
 //        while (true) {
@@ -179,12 +202,12 @@
 //
 //    fun computerMove() {
 //        emptyDeckDeal(computerDeck)
-//        val randomCard = computerDeck.random()
+//        val randomCard = computerMoveLogic()
 //        println()
 //        cardsOnTableUpdater()
 //        println(computerDeck.joinToString (separator = " "))
-//        println("Computer plays $randomCard")
-//        dealOrNoDeal("Computer", computerDeck, computerDeck.indexOf(randomCard), this::computerCardsCount, this::computerScoreCount)
+//        println("Computer plays ${computerDeck[randomCard]}")
+//        dealOrNoDeal("Computer", computerDeck, randomCard, this::computerCardsCount, this::computerScoreCount)
 //    }
 //
 //    private fun dealOrNoDeal(

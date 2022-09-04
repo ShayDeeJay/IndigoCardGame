@@ -2,8 +2,8 @@ class Deck {
 
 //    private val cardsOnTable = mutableListOf<String>("8♣", "10♣", "J♣", "7♠")
 //    private val computerDeck = mutableListOf<String>("2♣", "9♥", "5♠", "3♦")
-    private val cardsOnTable = mutableListOf<String>("8♣", "10♣", "J♣", "7♠")
-    private val computerDeck = mutableListOf<String>("Q♦")
+    private val cardsOnTable = mutableListOf<String>("4♦", "5♦", "10♠", "K♣")
+    private val computerDeck = mutableListOf<String>("Q♠", "8♠", "Q♦", "2♦", "10♦", "8♣")
 
 
 
@@ -34,11 +34,16 @@ class Deck {
         }
 
         fun randomCard() {
-            computerDeck.indexOf(computerDeck.random())
+            cardsPosition = computerDeck.indexOf(computerDeck.random())
         }
 
         if (computerDeck.size == 1) {
             return 0
+        }
+
+        for(j in computerDeck) {
+            if(j.last() == computerDeck.last().last())
+                suitCheck.add(j.last().toString() + computerDeck.indexOf(j))
         }
 
         for (i in cardsOnTable) {
@@ -63,7 +68,7 @@ class Deck {
                 cardsPosition = if(suitDistinct.size == 1) {
                     suitDistinct[0].last().digitToInt()
                 } else {
-                    rankCheck[0].last().digitToInt()
+                    rankDistinct[0].last().digitToInt()
                 }
             }
             cardsOnTable.size == 0 -> {
@@ -77,9 +82,20 @@ class Deck {
                 randomCard()
             }
             suitDistinct.size + rankDistinct.size >= 2 -> {
-                suitCheck()
-                rankCheck()
-                randomCard()
+                cardsPosition = if(suitDistinct.size == 2) {
+                    suitDistinct[0].last().digitToInt()
+                } else {
+                    rankCheck[0].last().digitToInt()
+                }
+                cardsPosition = when {
+                    suitDistinct.size >= 2 -> suitDistinct[0].last().digitToInt()
+                    rankDistinct.size >= 2 -> rankDistinct[0].last().digitToInt()
+                    else -> if(suitDistinct.isEmpty()) {
+                        rankDistinct[0].last().digitToInt()
+                    } else {
+                        suitDistinct[0].last().digitToInt()
+                    }
+                }
             }
         }
         return cardsPosition
@@ -88,6 +104,7 @@ class Deck {
 fun main() {
         val deck = Deck()
         println(deck.computerMoveLogic())
+
 
 }
 //    val deck = Deck()
