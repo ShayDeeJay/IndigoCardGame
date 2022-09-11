@@ -189,15 +189,15 @@ class Deck {
         return cardsPosition
     }
     fun playerMove(): Boolean {
+        emptyDeckDeal(playerDeck)
+        println()
+        cardsOnTableUpdater()
+        println("Cards in hand: ")
+        playerDeck.forEachIndexed {  index, card ->
+            print("${index + 1})$card ")
+        }
+        println()
         while (true) {
-            emptyDeckDeal(playerDeck)
-            println()
-            cardsOnTableUpdater()
-            println("Cards in hand: ")
-            playerDeck.forEachIndexed {  index, card ->
-                print("${index + 1})$card ")
-            }
-            println()
             println("Choose a card to play (1-${playerDeck.size}):")
             val playerInput = readln()
             if (playerInput == "exit") {
@@ -278,14 +278,8 @@ fun main() {
             println("Game Over")
             break
         }
-
         if (deck.mainDeck.size == 0 && deck.playerDeck.size == 0 && deck.computerDeck.size == 0) {
             when(deck.playerLastWon) {
-//                "nobody" -> {
-//                    if(deck.startDecision == "yes") {
-//                        deck.playerDeck += deck.cardsOnTable
-//                    } else deck.computerDeck += deck.cardsOnTable
-//                }
                 "Player" -> deck.playerDeck += deck.cardsOnTable
                 "Computer" -> deck.computerDeck += deck.cardsOnTable
             }
