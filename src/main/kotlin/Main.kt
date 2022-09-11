@@ -1,5 +1,4 @@
 import kotlin.reflect.KMutableProperty0
-
 class Deck {
     companion object {
         private val mainDeckOfCards = listOf(
@@ -9,31 +8,26 @@ class Deck {
             "A♣", "2♣", "3♣", "4♣", "5♣", "6♣", "7♣", "8♣", "9♣", "10♣", "J♣", "Q♣", "K♣"
         )
     }
-
-    val mainDeck = ArrayList(mainDeckOfCards)
-    val cardsOnTable = ArrayList<String>()
-    val playerDeck = ArrayList<String>()
-    val computerDeck = ArrayList<String>()
+    
+    private val mainDeck = ArrayList(mainDeckOfCards)
+    private val cardsOnTable = ArrayList<String>()
+    private val playerDeck = ArrayList<String>()
+    private val computerDeck = ArrayList<String>()
     var playerScoreCount = 0
     var playerCardsCount = 0
     var computerScoreCount = 0
     var computerCardsCount = 0
     var startDecision = ""
     var playerLastWon = ""
-
     fun shuffle() = mainDeck.shuffle()
-
     fun deal(): String = mainDeck[0]
-
     fun removeCard(): String = mainDeck.removeAt(0)
-
     fun cardsOnTableUpdater() {
         return when (cardsOnTable.size) {
             0 -> println("No cards on the table")
             else -> println("${cardsOnTable.size} cards on the table, and the top card is ${cardsOnTable.last()}")
         }
     }
-
     fun startDecision(): Boolean {
         when (startDecision) {
             "yes" -> {
@@ -51,7 +45,6 @@ class Deck {
         }
         return false
     }
-
     fun beforeStringCheck(list: ArrayList<String>): Int {
         var y = 0
         for (x in list) {
@@ -61,7 +54,6 @@ class Deck {
         }
         return y
     }
-
     fun scoreBoard() {
         println(
             """
@@ -70,12 +62,10 @@ class Deck {
             """.trimIndent()
         )
     }
-
     fun addAndRemove(a: ArrayList<String>, b: String, c: Int) {
         cardsOnTable.add(b)
         a.removeAt(c)
     }
-
     fun emptyDeckDeal(deck: ArrayList<String>) {
         if (deck.size < 1) {
             repeat(6) {
@@ -84,7 +74,6 @@ class Deck {
             }
         }
     }
-
     fun computerMoveLogic(): Int {
         var cardsPosition = 0
         val suitCheck = ArrayList<Int>()
@@ -101,6 +90,7 @@ class Deck {
                 }
             }
         }
+
         fun suitCheck(): Boolean {
             val tempList = computerDeck.toMutableList()
             tempList.sortBy { it.last() }
@@ -136,6 +126,7 @@ class Deck {
         winningCardCheck()
         val suitDistinct = suitCheck.distinct()
         val rankDistinct = rankCheck.distinct()
+
         when {
             suitDistinct.size + rankDistinct.size == 1 -> {
                 cardsPosition = if(suitDistinct.size == 1) {
@@ -214,7 +205,6 @@ class Deck {
             }
         }
     }
-
     fun computerMove() {
         emptyDeckDeal(computerDeck)
         println()
@@ -224,7 +214,6 @@ class Deck {
         println("Computer plays ${computerDeck[randomCard]}")
         dealOrNoDeal("Computer", computerDeck, randomCard, this::computerCardsCount, this::computerScoreCount,"Computer")
     }
-
     private fun dealOrNoDeal(
         type: String,
         cards: ArrayList<String>,
@@ -250,64 +239,70 @@ class Deck {
             addAndRemove(cards, currentCard, index)
         }
     }
-}
+    fun isGameOver(): Boolean {
+        while (true) {
+            startDecision
+            if (startDecision()) {
+                println("Game Over")
+                return true
+            }
+            if (mainDeck.size == 0 && playerDeck.size == 0 && computerDeck.size == 0) {
+                when(playerLastWon) {
+                    "Player" -> playerDeck += cardsOnTable
+                    "Computer" -> computerDeck += cardsOnTable
+                }
 
+                playerScoreCount += beforeStringCheck(playerDeck)
+                playerCardsCount += playerDeck.size
+                computerScoreCount += beforeStringCheck(computerDeck)
+                computerCardsCount += computerDeck.size
+
+                when {
+                    playerCardsCount > computerCardsCount ->  {
+                        playerScoreCount += 3
+                    }
+                    computerCardsCount > playerCardsCount -> {
+                        computerScoreCount += 3
+                    }
+                    else ->
+                        if (startDecision == "yes") {
+                            playerScoreCount += 3
+                        } else {
+                            computerScoreCount += 3
+                        }
+                }
+
+                println()
+                cardsOnTableUpdater()
+                scoreBoard()
+                println("Game Over")
+                return true
+            }
+        }
+    }
+    fun whoPlaysFirst(): Boolean {
+        while (true) {
+            println("Play first?")
+            val playerChoice = readln()
+            if (playerChoice == "yes" || playerChoice == "no") {
+                startDecision = playerChoice
+                shuffle()
+                repeat(4) {
+                    cardsOnTable.add(deal())
+                    removeCard()
+                }
+                println("Initial cards on the table: ${cardsOnTable.joinToString(separator = " ")}")
+                return true
+            }
+        }
+    }
+
+}
 fun main() {
     val deck = Deck()
     println("Indigo Card Game")
 
-    while (true) {
-        println("Play first?")
-        val playerChoice = readln()
+    deck.whoPlaysFirst()
 
-        if (playerChoice == "yes" || playerChoice == "no") {
-            deck.startDecision = playerChoice
-            deck.shuffle()
-            repeat(4) {
-                deck.cardsOnTable.add(deck.deal())
-                deck.removeCard()
-            }
-            println("Initial cards on the table: ${deck.cardsOnTable.joinToString(separator = " ")}")
-            break
-        }
-    }
-
-    while (true) {
-        deck.startDecision
-        if (deck.startDecision()) {
-            println("Game Over")
-            break
-        }
-        if (deck.mainDeck.size == 0 && deck.playerDeck.size == 0 && deck.computerDeck.size == 0) {
-            when(deck.playerLastWon) {
-                "Player" -> deck.playerDeck += deck.cardsOnTable
-                "Computer" -> deck.computerDeck += deck.cardsOnTable
-            }
-
-            deck.playerScoreCount += deck.beforeStringCheck(deck.playerDeck)
-            deck.playerCardsCount += deck.playerDeck.size
-            deck.computerScoreCount += deck.beforeStringCheck(deck.computerDeck)
-            deck.computerCardsCount += deck.computerDeck.size
-
-            when {
-                deck.playerCardsCount > deck.computerCardsCount ->  {
-                    deck.playerScoreCount += 3
-                }
-                deck.computerCardsCount > deck.playerCardsCount -> {
-                    deck.computerScoreCount += 3
-                }
-                else ->
-                    if (deck.startDecision == "yes") {
-                        deck.playerScoreCount += 3
-                    } else {
-                        deck.computerScoreCount += 3
-                    }
-            }
-            println()
-            deck.cardsOnTableUpdater()
-            deck.scoreBoard()
-            println("Game Over")
-            break
-        }
-    }
+    deck.isGameOver()
 }
