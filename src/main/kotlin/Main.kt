@@ -19,7 +19,7 @@ class Deck {
     var computerScoreCount = 0
     var computerCardsCount = 0
     var startDecision = ""
-    var playerLastMoved = ""
+    var playerLastWon = ""
 
     fun shuffle() = mainDeck.shuffle()
 
@@ -208,8 +208,7 @@ class Deck {
                 if (nextMove !in 0 until playerDeck.size) {
                     continue
                 }
-                dealOrNoDeal("Player", playerDeck, nextMove, this::playerCardsCount, this::playerScoreCount)
-                playerLastMoved = "Player"
+                dealOrNoDeal("Player", playerDeck, nextMove, this::playerCardsCount, this::playerScoreCount,"Player")
                 return false
             } catch (_: NumberFormatException) {
             }
@@ -223,8 +222,7 @@ class Deck {
         val randomCard = computerMoveLogic()
         println(computerDeck.joinToString (separator = " "))
         println("Computer plays ${computerDeck[randomCard]}")
-        dealOrNoDeal("Computer", computerDeck, randomCard, this::computerCardsCount, this::computerScoreCount)
-        playerLastMoved = "Computer"
+        dealOrNoDeal("Computer", computerDeck, randomCard, this::computerCardsCount, this::computerScoreCount,"Computer")
     }
 
     private fun dealOrNoDeal(
@@ -232,7 +230,8 @@ class Deck {
         cards: ArrayList<String>,
         index: Int,
         totalCards: KMutableProperty0<Int>,
-        totalScore: KMutableProperty0<Int>
+        totalScore: KMutableProperty0<Int>,
+        whoWonLast: String
     ) {
         val currentCard = cards[index]
         if (cardsOnTable.size > 0) {
@@ -243,6 +242,7 @@ class Deck {
                 cardsOnTable.clear()
                 println("$type wins cards")
                 scoreBoard()
+                playerLastWon = whoWonLast
             } else {
                 addAndRemove(cards, currentCard, index)
             }
@@ -272,23 +272,28 @@ fun main() {
         }
     }
 
-    while (deck.mainDeck.size > 0) {
+    while (true) {
         deck.startDecision
         if (deck.startDecision()) {
             println("Game Over")
             break
         }
 
-        if (deck.mainDeck.size == 0) {
-            if(deck.playerLastMoved == "Player") {
-                deck.playerDeck += deck.cardsOnTable
-            } else deck.computerDeck += deck.cardsOnTable
+        if (deck.mainDeck.size == 0 && deck.playerDeck.size == 0 && deck.computerDeck.size == 0) {
+            when(deck.playerLastWon) {
+//                "nobody" -> {
+//                    if(deck.startDecision == "yes") {
+//                        deck.playerDeck += deck.cardsOnTable
+//                    } else deck.computerDeck += deck.cardsOnTable
+//                }
+                "Player" -> deck.playerDeck += deck.cardsOnTable
+                "Computer" -> deck.computerDeck += deck.cardsOnTable
+            }
 
             deck.playerScoreCount += deck.beforeStringCheck(deck.playerDeck)
             deck.playerCardsCount += deck.playerDeck.size
             deck.computerScoreCount += deck.beforeStringCheck(deck.computerDeck)
             deck.computerCardsCount += deck.computerDeck.size
-
 
             when {
                 deck.playerCardsCount > deck.computerCardsCount ->  {
@@ -308,7 +313,7 @@ fun main() {
             deck.cardsOnTableUpdater()
             deck.scoreBoard()
             println("Game Over")
+            break
         }
     }
 }
-
