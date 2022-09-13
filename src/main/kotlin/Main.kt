@@ -7,10 +7,13 @@ class Deck {
             "A♦", "2♦", "3♦", "4♦", "5♦", "6♦", "7♦", "8♦", "9♦", "10♦", "J♦", "Q♦", "K♦",
             "A♣", "2♣", "3♣", "4♣", "5♣", "6♣", "7♣", "8♣", "9♣", "10♣", "J♣", "Q♣", "K♣"
         )
+        //Initial Immutable deck just to keep original content intact.
     }
-    
+
     private val mainDeck = ArrayList(mainDeckOfCards)
+    // Mutable main deck that can be altered based on the game.
     private val cardsOnTable = ArrayList<String>()
+    // All the current cards that are in play on the table.
     private val playerDeck = ArrayList<String>()
     private val computerDeck = ArrayList<String>()
     var playerScoreCount = 0
@@ -18,17 +21,39 @@ class Deck {
     var computerScoreCount = 0
     var computerCardsCount = 0
     var startDecision = ""
+    //Start decision is used later to determine who began the game for gameplay order.
+
     var playerLastWon = ""
-    fun shuffle() = mainDeck.shuffle()
-    fun deal(): String = mainDeck[0]
-    fun removeCard(): String = mainDeck.removeAt(0)
-    fun cardsOnTableUpdater() {
+    // Used to determine who won last incase scores are even at the end, last person to win would win extra point.
+    private fun deal(): String = mainDeck[0]
+    private fun removeCard(): String = mainDeck.removeAt(0)
+    private fun cardsOnTableUpdater() {
         return when (cardsOnTable.size) {
             0 -> println("No cards on the table")
             else -> println("${cardsOnTable.size} cards on the table, and the top card is ${cardsOnTable.last()}")
         }
     }
-    fun startDecision(): Boolean {
+    //Decides which message to display depending if cards on table, and how many as well as the relevant win card.
+
+    fun whoPlaysFirst(): Boolean {
+        while (true) {
+            println("Play first?")
+            val playerChoice = readln()
+            if (playerChoice == "yes" || playerChoice == "no") {
+                startDecision = playerChoice
+                mainDeck.shuffle()
+                repeat(4) {
+                    cardsOnTable.add(deal())
+                    removeCard()
+                }
+                println("Initial cards on the table: ${cardsOnTable.joinToString(separator = " ")}")
+                return true
+            }
+        }
+    }
+    //Player decides who gets to play first, question is on loop in case of incorrect input. Also displays the initial cards dealt on the table.
+
+    private fun startDecision(): Boolean {
         when (startDecision) {
             "yes" -> {
                 if (playerMove()) {
@@ -45,7 +70,8 @@ class Deck {
         }
         return false
     }
-    fun beforeStringCheck(list: ArrayList<String>): Int {
+    //Decides if a computer goes first or player. If statement is for is player chooses to "exit" and returns true to end the game.
+    private fun pointWorthyCards(list: ArrayList<String>): Int {
         var y = 0
         for (x in list) {
             when (x.first()) {
@@ -54,7 +80,8 @@ class Deck {
         }
         return y
     }
-    fun scoreBoard() {
+    //Checks if the list (computers deck or players deck) contains winnable cards which are worth 1 point each.
+    private fun scoreBoard() {
         println(
             """
             Score: Player $playerScoreCount - Computer $computerScoreCount
@@ -62,11 +89,12 @@ class Deck {
             """.trimIndent()
         )
     }
-    fun addAndRemove(a: ArrayList<String>, b: String, c: Int) {
+    private fun addAndRemove(a: ArrayList<String>, b: String, c: Int) {
         cardsOnTable.add(b)
         a.removeAt(c)
     }
-    fun emptyDeckDeal(deck: ArrayList<String>) {
+    //Removes a selected card from player/computers deck and adds it to the table.
+    private fun emptyDeckDeal(deck: ArrayList<String>) {
         if (deck.size < 1) {
             repeat(6) {
                 deck.add(deal())
@@ -74,24 +102,16 @@ class Deck {
             }
         }
     }
-    fun computerMoveLogic(): Int {
+    //Checks if a player/computers deck is empty, if so, replenishes 6 cards.
+    private fun computerMoveLogic(): Int {
         var cardsPosition = 0
+        //Index of the card in computers hand.
         val suitCheck = ArrayList<Int>()
+        //Hold multiple suits from deck, used later for move logic.
         val rankCheck = ArrayList<Int>()
-        fun winningCardCheck() {
-            if (cardsOnTable.size > 0) {
-                for(j in computerDeck) {
-                    if(j.last() == cardsOnTable.last().last())
-                        suitCheck.add(computerDeck.indexOf(j))
-                }
-                for(j in computerDeck) {
-                    if(j.first() == cardsOnTable.last().first())
-                        rankCheck.add(computerDeck.indexOf(j))
-                }
-            }
-        }
+        //Hold multiple ranks from deck, used later for move logic.
 
-        fun suitCheck(): Boolean {
+        fun suitCheckMultiple(): Boolean {
             val tempList = computerDeck.toMutableList()
             tempList.sortBy { it.last() }
             for(dupe in 0 until tempList.size -1) {
@@ -102,8 +122,9 @@ class Deck {
             }
             return false
         }
+        //Computers deck is sorted by "suit" to see if there are multiples, used in later logic to throw if there are no winnable cards.
 
-        fun rankCheck(): Boolean {
+        fun rankCheckMultiple(): Boolean {
             val tempList = computerDeck.toMutableList()
             tempList.sortBy { it.first() }
             for(dupe in 0 until tempList.size -1) {
@@ -114,18 +135,42 @@ class Deck {
             }
             return false
         }
+        //Computers deck is sorted by "rank" to see if there are multiples, used in later logic to throw if there are no winnable cards.
 
-        fun randomCard(){
-            cardsPosition = computerDeck.indexOf(computerDeck.random())
+        fun multiUseCardCheck() {
+            while (true) {
+                when {
+                    suitCheckMultiple() -> break
+                    rankCheckMultiple() -> break
+                    else -> {
+                        computerDeck.indexOf(computerDeck.random())
+                        break
+                    }
+                }
+            }
         }
+        //If no winnable cards, check to see if there are multiple suits, if not, then check multiple ranks, if neither apply, plays a card at random.
 
         if (computerDeck.size == 1) {
             return 0
         }
+        //if there is only one card in computers deck, plays it.
 
-        winningCardCheck()
+        if (cardsOnTable.size > 0) {
+            for(j in computerDeck) {
+                if(j.last() == cardsOnTable.last().last())
+                    suitCheck.add(computerDeck.indexOf(j))
+            }
+            for(j in computerDeck) {
+                if(j.first() == cardsOnTable.last().first())
+                    rankCheck.add(computerDeck.indexOf(j))
+            }
+        }
+        //Checks if any cards in hand match the top card on the table to win. first loops checks the "suit", and second loop checks the "rank".
+
         val suitDistinct = suitCheck.distinct()
         val rankDistinct = rankCheck.distinct()
+        //Sorts out any all the distinct cards from multiple check so see if there are more than one multiple in hand.
 
         when {
             suitDistinct.size + rankDistinct.size == 1 -> {
@@ -135,58 +180,46 @@ class Deck {
                     rankDistinct[0]
                 }
             }
+            //Checks to see if there is only one type multiple(one "suit" multiple or "rank").
+
             cardsOnTable.size == 0 -> {
-                while (true) {
-                    when {
-                        suitCheck() -> break
-                        rankCheck() -> break
-                        else -> {
-                            randomCard()
-                            break
-                        }
-                    }
-                }
+                multiUseCardCheck()
             }
+            //Check function.
+
             suitDistinct.size + rankDistinct.size == 0 -> {
-                while (true) {
-                    when {
-                        suitCheck() -> break
-                        rankCheck() -> break
-                        else -> {
-                            randomCard()
-                            break
-                        }
-                    }
-                }
+                multiUseCardCheck()
             }
+            //Check function.
 
             suitDistinct.size + rankDistinct.size >= 2 -> {
-                cardsPosition = if(suitDistinct.size >= 2) {
-                    suitDistinct[0]
-                } else {
-                    rankDistinct[0]
-                }
                 cardsPosition = when {
                     suitDistinct.size >= 2 -> suitDistinct[0]
                     rankDistinct.size >= 2 -> rankDistinct[0]
-                    else -> if(suitDistinct.isEmpty()) {
-                        rankDistinct[0]
-                    } else {
-                        suitDistinct[0]
-                    }
+                    else -> suitDistinct[0]
                 }
+                //1. If there are or 2 or more in suit, play one at random (in this case we just play 0).
+                //2. If there are or 2 or more in rank, play one at random (in this case we just play 0).
+                //3. If there is only 2 or cards in total, only one in each (suit + rank) just play suit card.
             }
         }
         return cardsPosition
+        //Adds card to variable, used later for index location in computers deck to make choice.
     }
-    fun playerMove(): Boolean {
+    private fun playerMove(): Boolean {
         emptyDeckDeal(playerDeck)
+        //Check function.
+
         println()
         cardsOnTableUpdater()
+        //Check function.
+
         println("Cards in hand: ")
         playerDeck.forEachIndexed {  index, card ->
             print("${index + 1})$card ")
         }
+        //Prints out cards in players hand to with the index of those cards to for player to make choice (cards index starts from 1).
+
         println()
         while (true) {
             println("Choose a card to play (1-${playerDeck.size}):")
@@ -200,62 +233,79 @@ class Deck {
                     continue
                 }
                 dealOrNoDeal("Player", playerDeck, nextMove, this::playerCardsCount, this::playerScoreCount,"Player")
+                //Check function.
                 return false
             } catch (_: NumberFormatException) {
             }
         }
+        //Loop is to ensure player makes applicable choice for available cards, as well as valid input.
     }
-    fun computerMove() {
+    private fun computerMove() {
         emptyDeckDeal(computerDeck)
+        //Check function.
+
         println()
         cardsOnTableUpdater()
-        val randomCard = computerMoveLogic()
+        //Check function.
+
+        val logicalCard = computerMoveLogic()
+        //Assigns computers choice to variable.
+
         println(computerDeck.joinToString (separator = " "))
-        println("Computer plays ${computerDeck[randomCard]}")
-        dealOrNoDeal("Computer", computerDeck, randomCard, this::computerCardsCount, this::computerScoreCount,"Computer")
+        //Computers deck is printed here to ensure computer has made correct logical choice.
+        
+        println("Computer plays ${computerDeck[logicalCard]}")
+        dealOrNoDeal("Computer", computerDeck, logicalCard, this::computerCardsCount, this::computerScoreCount,"Computer")
+        //Check function.
     }
     private fun dealOrNoDeal(
-        type: String,
-        cards: ArrayList<String>,
-        index: Int,
-        totalCards: KMutableProperty0<Int>,
+        type: String, //Assigned to player or computer.
+        cards: ArrayList<String>, //Assigned deck.
+        index: Int, //Index of selected card.
+        totalCards: KMutableProperty0<Int>, //KmutableProperty is used here to reassign external Mutable "VAR" variable to this function.
         totalScore: KMutableProperty0<Int>,
-        whoWonLast: String
+        whoWonLast: String //See variable at top.
     ) {
-        val currentCard = cards[index]
+        val currentCard = cards[index] // This is the chosen list, and chosen index position.
         if (cardsOnTable.size > 0) {
+            // First check to see if there are cards on the table, if not jump to else, where logical card is chosen.
             if (currentCard.first() == cardsOnTable.last().first() || currentCard.last() == cardsOnTable.last().last()) {
                 addAndRemove(cards, currentCard, index)
                 totalCards.set(totalCards.get() + cardsOnTable.size)
-                totalScore.set(totalScore.get() + beforeStringCheck(cardsOnTable))
+                totalScore.set(totalScore.get() + pointWorthyCards(cardsOnTable))
                 cardsOnTable.clear()
                 println("$type wins cards")
                 scoreBoard()
                 playerLastWon = whoWonLast
+                //This checks if the card selection made is a winning card, if so, the card is removed from deck and added to the cards on table.
+                //Then the cards from table are removed, and added to winners winning pile, if there are point worthy cards, those are added to tally.
             } else {
-                addAndRemove(cards, currentCard, index)
+                addAndRemove(cards, currentCard, index) //Check function.
             }
         } else {
-            addAndRemove(cards, currentCard, index)
+            addAndRemove(cards, currentCard, index) //Check function.
         }
     }
     fun isGameOver(): Boolean {
         while (true) {
-            startDecision
             if (startDecision()) {
+                //Checks to see if player has typed "exit" to end the game, otherwise will continue to play.
                 println("Game Over")
                 return true
             }
             if (mainDeck.size == 0 && playerDeck.size == 0 && computerDeck.size == 0) {
+                //If no playable cards are available at all the game ends.
                 when(playerLastWon) {
                     "Player" -> playerDeck += cardsOnTable
                     "Computer" -> computerDeck += cardsOnTable
+                    //whoever won last, gets all the remaining cards on the table (if applicable), this will count towards the score.
                 }
 
-                playerScoreCount += beforeStringCheck(playerDeck)
+                playerScoreCount += pointWorthyCards(playerDeck)
                 playerCardsCount += playerDeck.size
-                computerScoreCount += beforeStringCheck(computerDeck)
+                computerScoreCount += pointWorthyCards(computerDeck)
                 computerCardsCount += computerDeck.size
+                //This will count up all the cards and points that both player and computer have.
 
                 when {
                     playerCardsCount > computerCardsCount ->  {
@@ -264,14 +314,16 @@ class Deck {
                     computerCardsCount > playerCardsCount -> {
                         computerScoreCount += 3
                     }
+
+                    //Whoever has the most cards at the end, will gain an additional 3 points.
                     else ->
                         if (startDecision == "yes") {
                             playerScoreCount += 3
                         } else {
                             computerScoreCount += 3
                         }
+                    //If card counts are tied, whoever played first wins the additional points.
                 }
-
                 println()
                 cardsOnTableUpdater()
                 scoreBoard()
@@ -280,23 +332,6 @@ class Deck {
             }
         }
     }
-    fun whoPlaysFirst(): Boolean {
-        while (true) {
-            println("Play first?")
-            val playerChoice = readln()
-            if (playerChoice == "yes" || playerChoice == "no") {
-                startDecision = playerChoice
-                shuffle()
-                repeat(4) {
-                    cardsOnTable.add(deal())
-                    removeCard()
-                }
-                println("Initial cards on the table: ${cardsOnTable.joinToString(separator = " ")}")
-                return true
-            }
-        }
-    }
-
 }
 fun main() {
     val deck = Deck()
